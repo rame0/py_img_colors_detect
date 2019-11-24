@@ -1,6 +1,7 @@
 import argparse, cv2, os
 import numpy as np
 import _utils
+from matplotlib import pyplot as plt
 
 
 def remove_bg(image_name, in_path="img", out_path="out", main_rect_size=.02, fg_size=4, resize_to=500):
@@ -12,10 +13,12 @@ def remove_bg(image_name, in_path="img", out_path="out", main_rect_size=.02, fg_
 
     img_height, img_width = img.shape[:2]
 
-    if img_width > img_height:
+    width = img_width
+    height = img_height
+    if resize_to > 0 and img_width > img_height:
         height = resize_to
         width = round(img_width * height / img_height)
-    else:
+    elif resize_to > 0:
         width = resize_to
         height = round(img_height * width / img_width)
 
@@ -35,26 +38,25 @@ def remove_bg(image_name, in_path="img", out_path="out", main_rect_size=.02, fg_
     fg_rect = (fg_w, fg_h, width - fg_w, height - fg_h)
 
     # color: 0 - bg, 1 - fg, 2 - probable bg, 3 - probable fg
-    cv2.rectangle(mask, fg_rect[:2], fg_rect[2:4], color=2, thickness=-1)
-    # cv2.rectangle(mask, bg_rect[:2], bg_rect[2:4], color=1, thickness=bg_w*3)
-
-    mask_preset = mask.copy()
+    cv2.rectangle(mask, fg_rect[:2], fg_rect[2:4], color=1, thickness=-1)
 
     bgd_model1 = np.zeros((1, 65), np.float64)
     fgd_model1 = np.zeros((1, 65), np.float64)
-    bgd_model2 = np.zeros((1, 65), np.float64)
-    fgd_model2 = np.zeros((1, 65), np.float64)
 
-    cv2.grabCut(img_small, mask, bg_rect, bgd_model1, fgd_model1, 5, cv2.GC_INIT_WITH_RECT)
-    cv2.grabCut(img_small, mask, bg_rect, bgd_model2, fgd_model2, 2, cv2.GC_INIT_WITH_MASK)
-
+    try:
+        cv2.grabCut(img_small, mask, bg_rect, bgd_model1, fgd_model1, 3, cv2.GC_INIT_WITH_RECT)
+        mask1 = mask.copy()
+        cv2.rectangle(mask, (bg_rect[0], bg_rect[1]), (bg_rect[2], bg_rect[3]), color=2, thickness=bg_w * 3)
+        cv2.grabCut(img_small, mask, bg_rect, bgd_model1, fgd_model1, 10, cv2.GC_INIT_WITH_MASK)
+    except Exception:
+        mask = mask1.copy()
     # mask to remove background
     mask_result = np.where((mask == 1) + (mask == 3), 255, 0).astype('uint8')
 
     # if we are removing too much, assume there is no background
     unique, counts = np.unique(mask_result, return_counts=True)
     mask_dict = dict(zip(unique, counts))
-    if mask_dict[0] > mask_dict[255] * 1.2:
+    if 255 in mask_dict and mask_dict[0] > mask_dict[255] * 1.6:
         mask_result = np.where((mask == 0) + (mask != 1) + (mask != 3), 255, 0).astype('uint8')
 
     # apply mask to image
@@ -63,7 +65,7 @@ def remove_bg(image_name, in_path="img", out_path="out", main_rect_size=.02, fg_
 
     # save result
     masked = cv2.cvtColor(masked, cv2.COLOR_RGB2BGR)
-    cv2.imwrite(out_path + "/" + image_name, masked)
+    cv2.imwrite(out_path + "/" + image_name + ".png", masked)
 
 
 if __name__ == "__main__":
@@ -72,21 +74,28 @@ if __name__ == "__main__":
                         default="img_test", type=str)
     parser.add_argument('-o', '--out', help='Папка для результатов',
                         default="out_test", type=str)
-    parser.add_argument('-r', '--bgrectsize',
+    parser.add_argument('-b', '--bgrectsize',
                         help='Отступу от краев изображения точно считающийся фоном (должен быть > 0.0 и < 0.3)',
-                        default=0.02, type=float)
+                        default=0.04, type=float)
     parser.add_argument('-f', '--fgrect',
                         help='Процент изображения (область в центре) точно считающийся НЕ фоном ( > 0.0 и меньше 0.6)',
-                        default=0.4, type=int)
-    parser.add_argument('-s', '--resize', help='Изменить размер изображения к заданному (по меньшей стороне)',
-                        default=300, type=int)
+                        default=0.15, type=int)
+    parser.add_argument('-r', '--resize',
+                        help='Изменить размер изображения к заданному (по меньшей стороне). 0 - не менять размер',
+                        default=400, type=int)
 
     args = parser.parse_args()
     inPath = args.path
     outPath = args.out
-    bg_rect = args.bgrectsize
-    fg_rect = args.fgrect
+    bg_rect_size = args.bgrectsize
+    fg_rect_size = args.fgrect
     resize = args.resize
 
-    for filename in os.listdir(inPath):
-        remove_bg(filename, inPath, outPath, bg_rect, fg_rect, resize)
+    files = os.listdir(inPath)
+    count_files = len(files)
+
+    _utils.print_progress(0, count_files, prefix='Progress:', suffix='Complete', bar_length=50)
+    for i, filename in enumerate(files):
+        _utils.print_progress(i + 1, count_files, prefix='Progress:', suffix=filename, bar_length=50)
+        remove_bg(filename, inPath, outPath, bg_rect_size, fg_rect_size, resize)
+        _utils.print_progress(i + 1, count_files, prefix='Progress:', suffix="Complete", bar_length=50)
