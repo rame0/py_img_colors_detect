@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 from matplotlib import pyplot as plt
 
-img = cv2.imread("img/test3.jpg")
+img = cv2.imread("img_test/11.jpg")
 Z = img.reshape((-1, 3))
 
 # calc clusters and decolorize image
