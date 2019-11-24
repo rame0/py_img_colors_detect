@@ -96,4 +96,4 @@ def segment(net, path, show_orig=True, dev='cuda'):
 
 dlab = models.segmentation.deeplabv3_resnet101(pretrained=True).eval()
 
-segment(dlab, 'img/test1.jpg', show_orig=True)
+segment(dlab, 'img_test/1.jpg', show_orig=True)
