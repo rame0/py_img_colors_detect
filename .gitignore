@@ -2,3 +2,5 @@
 /out/
 /venv/
 /.idea/
+/out_test/
+/files.csv

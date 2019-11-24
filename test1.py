@@ -2,7 +2,7 @@ import numpy as np
 import cv2
 from matplotlib import pyplot as plt
 
-img = cv2.imread('img/test0.jpg')
+img = cv2.imread('img_test/7.jpg')
 gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
 _, thresh = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
