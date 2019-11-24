@@ -2,7 +2,7 @@ import numpy as np
 import cv2
 from matplotlib import pyplot as plt
 
-img = cv2.imread('img_test/7.jpg')
+img = cv2.imread('img_test/1.jpg')
 gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
 _, thresh = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
@@ -34,7 +34,7 @@ markers[unknown == 255] = 0
 markers = cv2.watershed(img, markers)
 img[markers == -1] = [255, 0, 0]
 
-plt.subplot(131), plt.imshow(sure_bg)
-plt.subplot(132), plt.imshow(sure_fg)
-plt.subplot(133), plt.imshow(img)
+plt.subplot(131), plt.imshow(sure_bg), plt.title("Background")
+plt.subplot(132), plt.imshow(sure_fg), plt.title("Foreground")
+plt.subplot(133), plt.imshow(img), plt.title("Image with markers")
 plt.show()
