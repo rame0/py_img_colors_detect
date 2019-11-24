@@ -3,15 +3,15 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 images = [
-    'test0.jpg',
-    'test1.jpg',
-    'test2.jpg',
-    'test3.jpg',
-    'test4.jpg'
+    'img_test/10.jpg',
+    'img_test/1.jpg',
+    'img_test/2.jpg',
+    'img_test/3.jpg',
+    'img_test/4.jpg'
 ]
 
 for img_file in images:
-    img = cv.imread('img/' + img_file, 0)
+    img = cv.imread(img_file, 0)
     img = cv.medianBlur(img, 5)
     ret, th1 = cv.threshold(img, 127, 255, cv.THRESH_BINARY)
     th2 = cv.adaptiveThreshold(img, 255, cv.ADAPTIVE_THRESH_MEAN_C, cv.THRESH_BINARY, 11, 2)
