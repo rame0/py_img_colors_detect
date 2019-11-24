@@ -6,7 +6,7 @@ from matplotlib import pyplot as plt
 def process(img):
     work_img = img.copy()
 
-    _, threshold = cv2.threshold(work_img, 137, 255, 0)
+    _, threshold = cv2.threshold(work_img, 30, 200, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
     contours, hierarchy = cv2.findContours(threshold, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
     max_area = 0
     max_contour = []
@@ -23,7 +23,7 @@ def process(img):
     return work_img, threshold
 
 
-img = cv2.imread("img_test/7.jpg", 0)
+img = cv2.imread("img_test/1.jpg", 0)
 img_blur = cv2.blur(img, (20, 20))
 
 res_img, threshold = process(img)
