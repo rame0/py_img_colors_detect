@@ -19,23 +19,24 @@ def process(img):
             max_area = cnt_area
             max_contour = approx
 
-    cv2.drawContours(work_img, [max_contour], 0, (255, 0, 0), 2)
+    work_img = cv2.cvtColor(work_img, cv2.COLOR_GRAY2RGB)
+    cv2.drawContours(work_img, [max_contour], 0, (255, 0, 0), 4)
 
     return work_img, threshold
 
 
-img = cv2.imread("img_test/1.jpg", 0)
+img = cv2.imread("img_test/5.jpg", 0)
 img_blur = cv2.blur(img, (20, 20))
 
 res_img, threshold = process(img)
 
 plt.subplot(231), plt.imshow(cv2.cvtColor(img, cv2.COLOR_GRAY2RGB)), plt.title('Image')
 plt.subplot(232), plt.imshow(threshold), plt.title('Threshold')
-plt.subplot(233), plt.imshow(cv2.cvtColor(res_img, cv2.COLOR_GRAY2RGB)), plt.title('Largest shape')
+plt.subplot(233), plt.imshow(res_img), plt.title('Largest shape')
 
 res_img, threshold = process(img_blur)
 plt.subplot(234), plt.imshow(cv2.cvtColor(img_blur, cv2.COLOR_BGR2RGB)), plt.title('Image blurred')
 plt.subplot(235), plt.imshow(threshold), plt.title('Threshold from blurred')
-plt.subplot(236), plt.imshow(cv2.cvtColor(res_img, cv2.COLOR_GRAY2RGB)), plt.title('Largest shape')
+plt.subplot(236), plt.imshow(res_img), plt.title('Largest shape')
 
 plt.show()
