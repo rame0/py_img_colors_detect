@@ -92,3 +92,19 @@ def print_progress(iteration, total, prefix='', suffix='', decimals=1, bar_lengt
     if iteration == total:
         sys.stdout.write('\n')
     sys.stdout.flush()
+
+
+def new_image_size(orig_width, orig_height, smallest_side_size):
+    new_w = orig_width
+    new_h = orig_height
+    if smallest_side_size <= 0:
+        return new_w, new_h
+
+    if orig_width > orig_height:
+        new_h = smallest_side_size
+        new_w = round(orig_width * new_h / orig_height)
+    else:
+        new_w = smallest_side_size
+        new_h = round(orig_height * new_w / orig_width)
+
+    return new_w, new_h
