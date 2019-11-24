@@ -6,6 +6,7 @@ from matplotlib import pyplot as plt
 def process(img):
     work_img = img.copy()
 
+    # _, threshold = cv2.threshold(work_img, 137, 255, 0)
     _, threshold = cv2.threshold(work_img, 30, 200, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
     contours, hierarchy = cv2.findContours(threshold, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
     max_area = 0
@@ -14,7 +15,7 @@ def process(img):
         approx = cv2.approxPolyDP(cnt, 0.1 * cv2.arcLength(cnt, True), True)
 
         cnt_area = cv2.contourArea(cnt)
-        if cnt_area > max_area:
+        if len(approx) > 3 and cnt_area > max_area:
             max_area = cnt_area
             max_contour = approx
 
@@ -28,13 +29,13 @@ img_blur = cv2.blur(img, (20, 20))
 
 res_img, threshold = process(img)
 
-plt.subplot(321), plt.imshow(cv2.cvtColor(img, cv2.COLOR_GRAY2RGB)), plt.title('Shapes')
-plt.subplot(323), plt.imshow(threshold), plt.title('Threshold')
-plt.subplot(325), plt.imshow(res_img), plt.title('Largest shape')
+plt.subplot(231), plt.imshow(cv2.cvtColor(img, cv2.COLOR_GRAY2RGB)), plt.title('Image')
+plt.subplot(232), plt.imshow(threshold), plt.title('Threshold')
+plt.subplot(233), plt.imshow(cv2.cvtColor(res_img, cv2.COLOR_GRAY2RGB)), plt.title('Largest shape')
 
 res_img, threshold = process(img_blur)
-plt.subplot(322), plt.imshow(cv2.cvtColor(img_blur, cv2.COLOR_BGR2RGB)), plt.title('blurred')
-plt.subplot(324), plt.imshow(threshold), plt.title('Threshold from blurred')
-plt.subplot(326), plt.imshow(res_img), plt.title('Largest shape')
+plt.subplot(234), plt.imshow(cv2.cvtColor(img_blur, cv2.COLOR_BGR2RGB)), plt.title('Image blurred')
+plt.subplot(235), plt.imshow(threshold), plt.title('Threshold from blurred')
+plt.subplot(236), plt.imshow(cv2.cvtColor(res_img, cv2.COLOR_GRAY2RGB)), plt.title('Largest shape')
 
 plt.show()
